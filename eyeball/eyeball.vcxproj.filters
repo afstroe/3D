@@ -21,6 +21,9 @@
     <Filter Include="qt\rc">
       <UniqueIdentifier>{31b748d4-7fe9-4138-84b9-0b9d81b36147}</UniqueIdentifier>
     </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{2dad5796-db7e-41ff-92cf-4c4655635508}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphics\opengl\opengl_ext.h">
@@ -28,6 +31,9 @@
     </ClInclude>
     <ClInclude Include="graphics\opengl\standard\glext.h">
       <Filter>graphics\opengl\standard</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\defines.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

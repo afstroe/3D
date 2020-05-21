@@ -17,6 +17,7 @@
   <ItemGroup>
     <ClInclude Include="graphics\opengl\opengl_ext.h" />
     <ClInclude Include="graphics\opengl\standard\glext.h" />
+    <ClInclude Include="utils\defines.h" />
     <QtMoc Include="qt\eyeball.h" />
     <QtMoc Include="qt\canvas.h" />
   </ItemGroup>
@@ -82,11 +83,17 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(LIBS_INC)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(LIBS_DIR)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(LIBS_INC)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(LIBS_DIR)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='FastDebug|x64'">
     <ClCompile>
@@ -95,6 +102,9 @@
       <WarningLevel>Level4</WarningLevel>
     </ClCompile>
     <Link />
+    <Link>
+      <AdditionalLibraryDirectories>$(LIBS_DIR)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
     <Import Project="$(QtMsBuild)\qt_defaults.props" />

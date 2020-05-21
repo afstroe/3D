@@ -5,3 +5,10 @@ eyeball::eyeball(QWidget *parent)
 {
     ui.setupUi(this);
 }
+
+void eyeball::closeEvent(QCloseEvent* event)
+{
+  UNREFERENCED_PARAMETER(event);
+
+  ui.canvas->close();  
+}

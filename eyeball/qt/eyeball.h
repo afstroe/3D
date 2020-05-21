@@ -10,6 +10,8 @@ class eyeball : public QMainWindow
 public:
     eyeball(QWidget *parent = Q_NULLPTR);
 
+    void closeEvent(QCloseEvent* event) override;
+
 private:
     Ui::eyeballClass ui;
 };

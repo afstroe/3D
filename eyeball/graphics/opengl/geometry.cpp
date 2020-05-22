@@ -1,5 +1,7 @@
 #include "geometry.h"
 
+#include <eyeball/app/appglobalstate.h>
+
 void Geometry::createBuffers()
 {
   glGenBuffers(1, &vertexBuffer);
@@ -13,20 +15,30 @@ void Geometry::createBuffers()
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(int), _indices.data(), GL_STATIC_DRAW);
 }
 
-void Geometry::draw(bool wireSolid)
+void Geometry::draw()
 {
+  auto debugState = AppGlobalState::get().debugMode();
+
   bind();
-  if (!wireSolid)
+
+  if (debugState & AppGlobalState::DM_SOLID_WIRE)
   {
-    glPolygonMode(_mode.faceMode, _mode.fillMode);
+    auto mode = debugState & AppGlobalState::DM_RENDER_BOTH_FACES ? GL_FRONT : GL_FRONT_AND_BACK;
+    glPolygonMode(mode, GL_FILL);
+    glDrawElements(_mode.drawMode, static_cast<GLsizei>(_numTriangles), GL_UNSIGNED_INT, nullptr);
+    glPolygonMode(mode, GL_LINE);
+    glColor3f(0.8f, 0.8f, 0.8f);
     glDrawElements(_mode.drawMode, static_cast<GLsizei>(_numTriangles), GL_UNSIGNED_INT, nullptr);
   }
-  else
+  else if (debugState & AppGlobalState::DM_WIREFRAME)
   {
-    glPolygonMode(GL_FRONT, GL_FILL);
+    auto mode = debugState & AppGlobalState::DM_RENDER_BOTH_FACES ? GL_FRONT : GL_FRONT_AND_BACK;
+    glPolygonMode(mode, GL_LINE);    
     glDrawElements(_mode.drawMode, static_cast<GLsizei>(_numTriangles), GL_UNSIGNED_INT, nullptr);
-    glPolygonMode(GL_FRONT, GL_LINE);
-    glColor3f(0.8f, 0.8f, 0.8f);
+  }    
+  else /*AppGlobalState::DM_DISABLED*/    
+  {
+    glPolygonMode(_mode.faceMode, _mode.fillMode);
     glDrawElements(_mode.drawMode, static_cast<GLsizei>(_numTriangles), GL_UNSIGNED_INT, nullptr);
   }
 }

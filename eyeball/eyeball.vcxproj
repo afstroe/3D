@@ -15,6 +15,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="app\appglobalstate.h" />
     <ClInclude Include="graphics\opengl\geometry.h" />
     <ClInclude Include="graphics\opengl\opengl_ext.h" />
     <ClInclude Include="graphics\opengl\standard\glext.h" />

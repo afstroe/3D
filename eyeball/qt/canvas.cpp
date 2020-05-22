@@ -26,7 +26,7 @@ Geometry myBall;
 
 void Canvas::initializeGL()
 {  
-  double radius = 0.2;
+  double radius = 5.0E-3;
   const size_t numSegments = 32;
   const double pi = 3.1415926535897932384626433832795;
   const double pi2 = 2 * pi;
@@ -89,15 +89,8 @@ void Canvas::paintGL()
   
   
   glDisable(GL_TEXTURE_2D);
-  //glBegin(GL_TRIANGLE_FAN);
-  //glColor3f(1.0f, 0.0f, 0.0f);
-  //for (size_t i = 0; i < myBall.indices.size(); ++i)
-  //{
-  //  glVertex2f(myBall.vertices[myBall.indices[i]].x, myBall.vertices[myBall.indices[i]].y);
-  //}
-  //glEnd();
 
-  myBall.draw(true);
+  myBall.draw();
 
 
   glBegin(GL_LINES);

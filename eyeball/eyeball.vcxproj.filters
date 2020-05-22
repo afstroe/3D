@@ -29,6 +29,9 @@
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
       <ParseFiles>true</ParseFiles>
     </Filter>
+    <Filter Include="app">
+      <UniqueIdentifier>{4167a4cf-6fc5-4f7f-8a60-6acd474d71f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphics\opengl\opengl_ext.h">
@@ -42,6 +45,9 @@
     </ClInclude>
     <ClInclude Include="graphics\opengl\geometry.h">
       <Filter>graphics\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="app\appglobalstate.h">
+      <Filter>app</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

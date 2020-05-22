@@ -30,12 +30,7 @@ public:
     GLuint faceMode = GL_FRONT;
   };
 
-  enum DebugMode 
-  {
-    DM_DISABLED = 0,
-    DM_WIREFRAME = 1 << 0, 
-    DM_WIRE_SOLID = 1 << 1,
-  };
+
 
   DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(std::vector<Point2<float>>, vertices);
 
@@ -61,7 +56,7 @@ public:
 
   void createBuffers();
 
-  void draw(bool wireSolid = false);
+  void draw();
 
   void drawImmediate();
 };

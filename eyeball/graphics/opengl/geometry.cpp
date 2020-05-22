@@ -26,6 +26,9 @@ void Geometry::draw()
     auto mode = debugState & AppGlobalState::DM_RENDER_BOTH_FACES ? GL_FRONT : GL_FRONT_AND_BACK;
     glPolygonMode(mode, GL_FILL);
     glDrawElements(_mode.drawMode, static_cast<GLsizei>(_numTriangles), GL_UNSIGNED_INT, nullptr);
+    
+    _material.detach();
+    
     glPolygonMode(mode, GL_LINE);
     glColor3f(0.8f, 0.8f, 0.8f);
     glDrawElements(_mode.drawMode, static_cast<GLsizei>(_numTriangles), GL_UNSIGNED_INT, nullptr);
@@ -53,4 +56,15 @@ void Geometry::drawImmediate()
     glVertex2f(_vertices[_indices[i]].x, _vertices[_indices[i]].y);
   }
   glEnd();
+}
+
+void Geometry::materialFromFiles(const char* vertexShader, const char* fragmentShader)
+{
+  _material = Shader::fromFiles(vertexShader, fragmentShader);
+}
+
+Geometry::~Geometry()
+{
+  glDeleteBuffers(1, &vertexBuffer);
+  glDeleteBuffers(1, &indexBuffer);
 }

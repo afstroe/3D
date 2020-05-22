@@ -60,9 +60,8 @@ void Canvas::initializeGL()
 
   myBall.createBuffers();
 
-  myShader = Shader::fromFiles("shaders/test.vert", "shaders/test.frag");
-
-  myShader.set("a", glUniform1i, 128);
+  myBall.materialFromFiles("shaders/test.vert", "shaders/test.frag");
+  myBall.material().set("a", glUniform1i, 128);
 
   // below thread will send a repaint signal for the canvas at 16 milliseconds
   // until the widget is closed.

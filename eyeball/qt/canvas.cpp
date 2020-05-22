@@ -9,93 +9,18 @@
 #include <iostream>
 #include <sstream>
 
-#include <gl/GL.h>
+
 
 #include "canvas.h"
 #include <eyeball/graphics/opengl/opengl_ext.h>
 #include <eyeball/utils/defines.h>
-
+#include <eyeball/graphics/opengl/geometry.h>
 
 Canvas::Canvas(QWidget* parent)
 {
   setParent(parent);
 }
 
-class Geometry
-{
-public:
-  template <typename Type>
-  struct Point2 {
-    Type x;
-    Type y;
-    Point2()
-    {
-      x = 0;
-      y = 0;
-    }
-  };
-
-  struct Mode 
-  {
-    GLuint drawMode = GL_TRIANGLES;
-    GLuint fillMode = GL_FILL;
-    GLuint faceMode = GL_FRONT;
-  };
-
-  DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(std::vector<Point2<float>>, vertices);
-   
-  DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(std::vector<int>, indices);
-  DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(size_t, numTriangles);
-  DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(Mode, mode);
-
-  GLuint vertexBuffer = 0;
-  GLuint indexBuffer = 0;
-
-
-  Geometry() :
-    _numTriangles(0)  
-  {
-    ;
-  }
-
-  inline void bind()
-  {
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-  }
-
-  void createBuffers()
-  {
-    glGenBuffers(1, &vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(Point2<float>), _vertices.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glEnableVertexAttribArray(0);
-
-    glGenBuffers(1, &indexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(int), _indices.data(), GL_STATIC_DRAW);    
-  }
-
-  void draw()
-  {
-    bind();
-    glPolygonMode(_mode.faceMode, _mode.fillMode);
-    glDrawElements(_mode.drawMode, static_cast<GLsizei>(_numTriangles), GL_UNSIGNED_INT, nullptr);
-  }
-
-  void drawImmediate()
-  {
-    glPolygonMode(_mode.faceMode, _mode.fillMode);
-    glBegin(_mode.drawMode);
-    glColor3f(1.0f, 0.0f, 0.0f);
-    for (size_t i = 0; i < _indices.size(); ++i)
-    {
-      glVertex2f(_vertices[_indices[i]].x, _vertices[_indices[i]].y);
-    }
-    glEnd();
-  }
-};
 
 Geometry myBall;
 
@@ -172,7 +97,7 @@ void Canvas::paintGL()
   //}
   //glEnd();
 
-  myBall.draw();
+  myBall.draw(true);
 
 
   glBegin(GL_LINES);

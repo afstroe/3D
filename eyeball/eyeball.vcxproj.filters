@@ -24,6 +24,11 @@
     <Filter Include="utils">
       <UniqueIdentifier>{2dad5796-db7e-41ff-92cf-4c4655635508}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <ParseFiles>true</ParseFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphics\opengl\opengl_ext.h">
@@ -35,6 +40,9 @@
     <ClInclude Include="utils\defines.h">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\opengl\geometry.h">
+      <Filter>graphics\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="qt\canvas.cpp">
@@ -45,6 +53,9 @@
     </ClCompile>
     <ClCompile Include="qt\main.cpp">
       <Filter>qt</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opengl\geometry.cpp">
+      <Filter>graphics\opengl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

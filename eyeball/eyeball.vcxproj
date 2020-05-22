@@ -18,13 +18,17 @@
     <ClInclude Include="app\appglobalstate.h" />
     <ClInclude Include="graphics\opengl\geometry.h" />
     <ClInclude Include="graphics\opengl\opengl_ext.h" />
+    <ClInclude Include="graphics\opengl\shaders.h" />
     <ClInclude Include="graphics\opengl\standard\glext.h" />
+    <ClInclude Include="graphics\opengl\utils.h" />
+    <ClInclude Include="utils\debugout.h" />
     <ClInclude Include="utils\defines.h" />
     <QtMoc Include="qt\eyeball.h" />
     <QtMoc Include="qt\canvas.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\opengl\geometry.cpp" />
+    <ClCompile Include="graphics\opengl\shaders.cpp" />
     <ClCompile Include="qt\canvas.cpp" />
     <ClCompile Include="qt\eyeball.cpp" />
     <ClCompile Include="qt\main.cpp" />
@@ -104,6 +108,7 @@
       <AdditionalIncludeDirectories>$(LIBS_INC)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>DOUT;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link />
     <Link>

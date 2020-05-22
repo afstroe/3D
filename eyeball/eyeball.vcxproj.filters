@@ -49,6 +49,15 @@
     <ClInclude Include="app\appglobalstate.h">
       <Filter>app</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\opengl\shaders.h">
+      <Filter>graphics\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\debugout.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opengl\utils.h">
+      <Filter>graphics\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="qt\canvas.cpp">
@@ -61,6 +70,9 @@
       <Filter>qt</Filter>
     </ClCompile>
     <ClCompile Include="graphics\opengl\geometry.cpp">
+      <Filter>graphics\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opengl\shaders.cpp">
       <Filter>graphics\opengl</Filter>
     </ClCompile>
   </ItemGroup>

@@ -15,6 +15,7 @@
 #include <eyeball/graphics/opengl/opengl_ext.h>
 #include <eyeball/utils/defines.h>
 #include <eyeball/graphics/opengl/geometry.h>
+#include <eyeball/graphics/opengl/shaders.h>
 
 Canvas::Canvas(QWidget* parent)
 {
@@ -23,10 +24,11 @@ Canvas::Canvas(QWidget* parent)
 
 
 Geometry myBall;
+Shader myShader;
 
 void Canvas::initializeGL()
 {  
-  double radius = 5.0E-3;
+  double radius = 5.0E-2;
   const size_t numSegments = 32;
   const double pi = 3.1415926535897932384626433832795;
   const double pi2 = 2 * pi;
@@ -57,6 +59,10 @@ void Canvas::initializeGL()
   myBall.mode() = { GL_TRIANGLE_FAN, GL_FILL, GL_FRONT };
 
   myBall.createBuffers();
+
+  myShader = Shader::fromFiles("shaders/test.vert", "shaders/test.frag");
+
+  myShader.set("a", glUniform1i, 128);
 
   // below thread will send a repaint signal for the canvas at 16 milliseconds
   // until the widget is closed.
@@ -90,7 +96,9 @@ void Canvas::paintGL()
   
   glDisable(GL_TEXTURE_2D);
 
+  myShader.attach();
   myBall.draw();
+  myShader.detach();
 
 
   glBegin(GL_LINES);

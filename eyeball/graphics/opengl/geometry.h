@@ -1,4 +1,5 @@
 #ifndef __GEOMETRY_H__
+#define __GEOMETRY_H__
 
 #include <eyeball/utils/defines.h>
 
@@ -29,8 +30,6 @@ public:
     GLuint fillMode = GL_FILL;
     GLuint faceMode = GL_FRONT;
   };
-
-
 
   DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(std::vector<Point2<float>>, vertices);
 

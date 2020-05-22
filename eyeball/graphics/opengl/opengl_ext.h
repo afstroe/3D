@@ -313,6 +313,7 @@ GET_FUNCTION_POINTER(PFNGLVERTEXATTRIBPOINTERPROC           , glVertexAttribPoin
 #define glIsShader                      glIsShader_()                    
 #define glLinkProgram                   glLinkProgram_()                 
 #define glShaderSource                  glShaderSource_()                
+#define glUseProgram                    glUseProgram_()
 #define glUniform1f                     glUniform1f_()                   
 #define glUniform2f                     glUniform2f_()                   
 #define glUniform3f                     glUniform3f_()                   

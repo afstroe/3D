@@ -1,4 +1,5 @@
 #ifndef __APP_GLOBAL_STATE_H__
+#define __APP_GLOBAL_STATE_H__
 
 #include <eyeball/utils/defines.h>
 

@@ -5,17 +5,17 @@
 #endif
 
 #include <qopenglcontext.h>
+#include <qevent.h>
 
 #include <iostream>
 #include <sstream>
-
-
+#include <gtc/type_ptr.hpp>
 
 #include "canvas.h"
 #include <eyeball/graphics/opengl/opengl_ext.h>
 #include <eyeball/utils/defines.h>
 #include <eyeball/graphics/opengl/geometry.h>
-#include <eyeball/graphics/opengl/shaders.h>
+#include <eyeball/graphics/camera.h>
 
 Canvas::Canvas(QWidget* parent)
 {
@@ -24,7 +24,8 @@ Canvas::Canvas(QWidget* parent)
 
 
 Geometry myBall;
-Shader myShader;
+Camera camera;
+
 
 void Canvas::initializeGL()
 {  
@@ -63,6 +64,9 @@ void Canvas::initializeGL()
   myBall.materialFromFiles("shaders/test.vert", "shaders/test.frag");
   myBall.material().set("a", glUniform1i, 128);
 
+  camera.mode() = Camera::Mode::PERSPECTIVE;
+  camera.position() = glm::vec3(0, 0, -2);
+
   // below thread will send a repaint signal for the canvas at 16 milliseconds
   // until the widget is closed.
   paintTrigger = std::thread([&](std::future<void> futureObj) {
@@ -72,6 +76,8 @@ void Canvas::initializeGL()
     }
     }, std::move(exitSignal.get_future()));
   paintTrigger.detach();
+
+  grabKeyboard();
 }
 
 void Canvas::paintGL()
@@ -83,33 +89,32 @@ void Canvas::paintGL()
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glOrtho(-0.5, 0.5, -0.5, 0.5, 0.0f, 1.0f);
-  
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  
+  auto viewMatrix = camera.transform();
+  auto a = glm::value_ptr(viewMatrix);
+  myBall.material().set("mvpMatrix", glUniformMatrix4fv, 1, GL_FALSE, glm::value_ptr(viewMatrix));  
 
-  
+  //glOrtho(-0.5, 0.5, -0.5, 0.5, 0.0f, 1.0f);
   
   glDisable(GL_TEXTURE_2D);
 
-  myShader.attach();
   myBall.draw();
-  myShader.detach();
 
+
+  Shader::detach();
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  glMultMatrixf(glm::value_ptr(viewMatrix));
 
   glBegin(GL_LINES);
   glColor3f(0.0f, 0.0f, 1.0f);
-  glVertex2f(-0.5, 0.0);
-  glVertex2f(0.5, 0.0);
-  glVertex2f(0, 0.5);
-  glVertex2f(0, -0.5);
+  glVertex3f(-0.5, 0.0, 0.0);
+  glVertex3f(0.5, 0.0, 0.0);
+  glVertex3f(0, 0.5, 0.0);
+  glVertex3f(0, -0.5, 0.0);
   glEnd();
 
-
-  y += 0.01;
+  OPENGL_CHECK_ERROR();
 }
 
 void Canvas::resizeGL(int w, int h)
@@ -123,5 +128,49 @@ void Canvas::closeEvent(QCloseEvent* event)
 
   // set the signal to exit the clock thread
   exitSignal.set_value();
+}
+
+void Canvas::keyPressEvent(QKeyEvent* event)
+{
+  switch (event->key())
+  {
+    case Qt::Key_Up:
+      camera.position().z += 0.1f;
+    break;   
+    case Qt::Key_Down:
+      camera.position().z -= 0.1f;
+    break;
+    case Qt::Key_Left:
+      camera.heading() -= 1.0f;
+    break;   
+    case Qt::Key_Right:
+      camera.heading() += 1.0f;
+    break;
+    case Qt::Key_8:
+      if (event->modifiers() & Qt::KeypadModifier)
+      {
+        camera.pitch() += 1.0f;
+      }
+    break;   
+    case Qt::Key_2:
+      if (event->modifiers() & Qt::KeypadModifier)
+      {
+        camera.pitch() -= 1.0f;
+      }
+    break;
+    case Qt::Key_6:
+      if (event->modifiers() & Qt::KeypadModifier)
+      {
+        camera.roll() += 1.0f;
+      }
+    break;   
+    case Qt::Key_4:
+      if (event->modifiers() & Qt::KeypadModifier)
+      {
+        camera.roll() -= 1.0f;
+      }
+    break;
+  }
+  int a = 0;
 }
 

@@ -6,6 +6,7 @@ layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texCoords0;
 
 uniform int a;
+uniform mat4 mvpMatrix;
 
 out float fa;
 
@@ -15,6 +16,6 @@ void main()
   // uniform buffers
   // vec4 p = gl_ModelViewMatrix * vec4(position, 1.0); 
   // gl_Position = gl_ProjectionMatrix * p;
-  gl_Position = vec4(position, 1.0);
+  gl_Position = mvpMatrix * vec4(position, 1.0);
   fa = a / 255.0;
 }

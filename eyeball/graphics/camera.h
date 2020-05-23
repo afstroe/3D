@@ -8,6 +8,7 @@
 
 class Camera
 {
+public:
   enum class Mode
   {
     ORTHO = 0,
@@ -38,6 +39,33 @@ class Camera
   DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(Perspective, perspectiveData);
   DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(Ortho, parallelData);
 
+  inline const float& heading() const
+  {
+    return _attitude.y;
+  }
+  inline float& heading()
+  {
+    return _attitude.y;
+  }
+
+  inline const float& pitch() const
+  {
+    return _attitude.x;
+  }
+  inline float& pitch()
+  {
+    return _attitude.x;
+  }
+
+  inline const float& roll() const
+  {
+    return _attitude.z;
+  }
+  inline float& roll()
+  {
+    return _attitude.z;
+  }
+
   inline Camera():
     _mode(Mode::ORTHO)
   {
@@ -45,6 +73,9 @@ class Camera
   }
 
   glm::mat4 transform();
+  glm::mat4 mvMatrix();
+  glm::mat4 attitudeMatrix();
+
 };
 
 

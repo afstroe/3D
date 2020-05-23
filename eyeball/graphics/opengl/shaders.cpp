@@ -115,7 +115,7 @@ namespace {
     FOR(i, numUniforms)
     {      
       glGetActiveUniform(programID, i, 1023, &size, &len, &type, uniformName);
-      uniformName[len] = 0;
+      uniformName[size] = 0;
       auto location = glGetUniformLocation(programID, uniformName);      
       uniforms[uniformName] = location;
     }

@@ -7,6 +7,7 @@
 
 #pragma comment (lib, "glu32.lib")
 
+#ifdef ENABLE_OPENGL_ERROR_CHECKING
 #define OPENGL_CHECK_ERROR()                                                                                                           \
     {                                                                                                                                  \
       if(const GLenum openglError = glGetError())                                                                                      \
@@ -23,8 +24,6 @@
         }                                                                                                                              \
       }                                                                                                                                \
     }
-
-
 #define OPENGL_CHECK_CONTEXT()                                                            \
 {                                                                                         \
     if(wglGetCurrentContext() == NULL)                                                    \
@@ -39,6 +38,11 @@
         }                                                                                 \
     }                                                                                     \
 }
+#else
+#define OPENGL_CHECK_ERROR()
+#define OPENGL_CHECK_CONTEXT()
+#endif
+
 
 inline bool haveOpenGLContext()
 {

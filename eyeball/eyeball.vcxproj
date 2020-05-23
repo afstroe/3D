@@ -110,7 +110,7 @@
       <AdditionalIncludeDirectories>$(LIBS_INC)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>DOUT;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DOUT;_CRT_SECURE_NO_WARNINGS;ENABLE_OPENGL_ERROR_CHECKING</PreprocessorDefinitions>
     </ClCompile>
     <Link />
     <Link>

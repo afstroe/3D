@@ -24,7 +24,7 @@ public:
     }    
   }
 
-  void detach()
+  static void detach()
   {
     glUseProgram(0);
   }

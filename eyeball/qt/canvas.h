@@ -27,6 +27,8 @@ protected:
 
   void closeEvent(QCloseEvent* event) override;
 
+  void keyPressEvent(QKeyEvent* event) override;
+
 protected:
   std::thread paintTrigger;
   std::promise<void> exitSignal;

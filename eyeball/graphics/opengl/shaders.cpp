@@ -162,5 +162,12 @@ Shader Shader::fromFiles(const char* vertexShader, const char* fragmentShader)
 
 Shader::~Shader()
 {
-  glDeleteProgram(programID);
+  if (haveOpenGLContext())
+  {
+    if (programID > 0)
+    {
+      detach();
+      glDeleteProgram(programID);
+    }
+  }
 }

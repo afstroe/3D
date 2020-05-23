@@ -65,6 +65,11 @@ void Geometry::materialFromFiles(const char* vertexShader, const char* fragmentS
 
 Geometry::~Geometry()
 {
-  glDeleteBuffers(1, &vertexBuffer);
-  glDeleteBuffers(1, &indexBuffer);
+  if (haveOpenGLContext())
+  {
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glDeleteBuffers(1, &vertexBuffer);
+    glDeleteBuffers(1, &indexBuffer);
+  }
 }

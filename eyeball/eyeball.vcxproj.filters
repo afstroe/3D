@@ -58,6 +58,9 @@
     <ClInclude Include="graphics\opengl\utils.h">
       <Filter>graphics\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\camera.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="qt\canvas.cpp">
@@ -74,6 +77,9 @@
     </ClCompile>
     <ClCompile Include="graphics\opengl\shaders.cpp">
       <Filter>graphics\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\camera.cpp">
+      <Filter>graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

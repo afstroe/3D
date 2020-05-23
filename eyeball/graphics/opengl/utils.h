@@ -25,5 +25,25 @@
     }
 
 
+#define OPENGL_CHECK_CONTEXT()                                                            \
+{                                                                                         \
+    if(wglGetCurrentContext() == NULL)                                                    \
+    {                                                                                     \
+        if(!IsDebuggerPresent())                                                          \
+        {                                                                                 \
+          debugLog("No OpenGL context found on file '%', line %", __FILE__, __LINE__);    \
+        }                                                                                 \
+        else                                                                              \
+        {                                                                                 \
+            __debugbreak();                                                               \
+        }                                                                                 \
+    }                                                                                     \
+}
+
+inline bool haveOpenGLContext()
+{
+  return wglGetCurrentContext() != NULL;
+}
+
 #endif // !__OPENGL_UTILS_H__
 

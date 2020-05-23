@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app\appglobalstate.h" />
+    <ClInclude Include="graphics\camera.h" />
     <ClInclude Include="graphics\opengl\geometry.h" />
     <ClInclude Include="graphics\opengl\opengl_ext.h" />
     <ClInclude Include="graphics\opengl\shaders.h" />
@@ -27,6 +28,7 @@
     <QtMoc Include="qt\canvas.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="graphics\camera.cpp" />
     <ClCompile Include="graphics\opengl\geometry.cpp" />
     <ClCompile Include="graphics\opengl\shaders.cpp" />
     <ClCompile Include="qt\canvas.cpp" />

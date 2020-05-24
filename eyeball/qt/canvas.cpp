@@ -9,7 +9,6 @@
 
 #include <iostream>
 #include <sstream>
-#include <gtc/type_ptr.hpp>
 
 #include "canvas.h"
 #include <eyeball/graphics/opengl/opengl_ext.h>
@@ -65,7 +64,7 @@ void Canvas::initializeGL()
   myBall.material().set("a", glUniform1i, 128);
 
   camera.mode() = Camera::Mode::PERSPECTIVE;
-  camera.position() = glm::vec3(0, 0, -2);
+  camera.position() = glm::vec3(0, 0, -2);  
 
   // below thread will send a repaint signal for the canvas at 16 milliseconds
   // until the widget is closed.
@@ -89,8 +88,12 @@ void Canvas::paintGL()
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  auto viewMatrix = camera.transform();
-  auto a = glm::value_ptr(viewMatrix);
+  //auto viewMatrix = camera.transform();
+
+  auto viewMatrix = camera.projectionMatrix() * camera.lookAt({ 0, 0, 0 });
+
+  auto a = glm::value_ptr(viewMatrix);  
+
   myBall.material().set("mvpMatrix", glUniformMatrix4fv, 1, GL_FALSE, glm::value_ptr(viewMatrix));  
 
   //glOrtho(-0.5, 0.5, -0.5, 0.5, 0.0f, 1.0f);
@@ -141,10 +144,24 @@ void Canvas::keyPressEvent(QKeyEvent* event)
       camera.position().z -= 0.1f;
     break;
     case Qt::Key_Left:
-      camera.heading() -= 1.0f;
+      if (event->modifiers() & Qt::ShiftModifier)
+      {
+        camera.position().x += 0.1f;
+      }
+      else 
+      {
+        camera.heading() -= 1.0f;
+      }      
     break;   
     case Qt::Key_Right:
-      camera.heading() += 1.0f;
+      if (event->modifiers() & Qt::ShiftModifier)
+      {
+        camera.position().x -= 0.1f;
+      }
+      else
+      {
+        camera.heading() += 1.0f;
+      }
     break;
     case Qt::Key_8:
       if (event->modifiers() & Qt::KeypadModifier)

@@ -25,7 +25,7 @@ namespace {
       file.read(const_cast<char*>(out.c_str()), fileSize);
     }
 
-    return file.eof();
+    return out.length() > 0;
   }
 
   bool compile(GLenum shaderType​, const std::string& shaderCode, GLuint& shader)
@@ -47,6 +47,7 @@ namespace {
       glGetShaderInfoLog(shader, logSize, &written, shaderLogString);
 
       debugLog(">>> Shader failed to compile. Error log is:\n%", shaderLogString);
+      debugLog(shaderCode.c_str());
       glDeleteShader(shader);
       shader = 0;
     }
@@ -122,52 +123,65 @@ namespace {
 
     return uniforms;
   }
+
+  GLuint programFromFiles(const char* vertexShader, const char* fragmentShader)
+  {
+    std::string vertexShaderCode, fragmentShaderCode;
+
+    GLuint glVertexShader = 0, glFragmentShader = 0, glProgram = 0;
+
+    if (!readFile(vertexShader, vertexShaderCode))
+    {
+      debugLog(">>> Failed to read vertex shader %", vertexShader);
+    }
+    else
+    {
+      compile(GL_VERTEX_SHADER, vertexShaderCode, glVertexShader);
+    }
+
+    if (!readFile(fragmentShader, fragmentShaderCode))
+    {
+      debugLog(">>> Failed to read vertex shader %", fragmentShader);
+    }
+    else
+    {
+      compile(GL_FRAGMENT_SHADER, fragmentShaderCode, glFragmentShader);
+    }
+
+    if (vertexShader && fragmentShader)
+    {
+      if (!link(glVertexShader, glFragmentShader, glProgram))
+      {
+        return 0;
+      }
+    }
+    
+    return glProgram;
+  }
 }
 
-Shader Shader::fromFiles(const char* vertexShader, const char* fragmentShader)
+
+std::unique_ptr<Shader> Shader::fromFiles(const char* vertexShader, const char* fragmentShader)
 {
-  std::string vertexShaderCode, fragmentShaderCode;
-
-  GLuint glVertexShader = 0, glFragmentShader = 0, glProgram = 0;
-
-  if (!readFile(vertexShader, vertexShaderCode))
-  {
-    debugLog(">>> Failed to read vertex shader %", vertexShader);
-  }
-  else
-  {
-    compile(GL_VERTEX_SHADER, vertexShaderCode, glVertexShader);
-  }
-
-  if (!readFile(fragmentShader, fragmentShaderCode))
-  {
-    debugLog(">>> Failed to read vertex shader %", fragmentShader);
-  }
-  else
-  {
-    compile(GL_FRAGMENT_SHADER, fragmentShaderCode, glFragmentShader);
-  }
-
-  if (vertexShader && fragmentShader)
-  {
-    if (!link(glVertexShader, glFragmentShader, glProgram))
-    {
-      return Shader();
-    }
-  }
-  
+  auto glProgram = programFromFiles(vertexShader, fragmentShader);
   auto uniforms = extractUniforms(glProgram);
-  return Shader(glProgram, uniforms);
+  return std::make_unique<Shader>(glProgram, uniforms);
 }
 
 Shader::~Shader()
 {
   if (haveOpenGLContext())
   {
-    if (programID > 0)
+    if (m_programID > 0)
     {
       detach();
-      glDeleteProgram(programID);
+      glDeleteProgram(m_programID);
     }
   }
+}
+
+void Shader::construct(const char* vertexShader, const char* fragmentShader)
+{
+  m_programID = programFromFiles(vertexShader, fragmentShader);
+  m_uniforms = extractUniforms(m_programID);
 }

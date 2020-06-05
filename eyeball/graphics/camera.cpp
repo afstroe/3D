@@ -17,15 +17,15 @@ glm::mat4 Camera::transform()
 glm::mat4 Camera::projectionMatrix()
 {
 	glm::mat4 projectionMatrix;
-	switch (_mode)
+	switch (m_mode)
 	{
 	case Mode::PERSPECTIVE:
-		projectionMatrix = glm::perspective(_perspectiveData.verticalAngle, _perspectiveData.aspectRatio, _perspectiveData.nearPlane, _perspectiveData.farPlane);
+		projectionMatrix = glm::perspective(m_perspectiveData.verticalAngle, m_perspectiveData.aspectRatio, m_perspectiveData.nearPlane, m_perspectiveData.farPlane);
 		break;
 
 	case Mode::ORTHO:
 	default:
-		projectionMatrix = glm::ortho(_parallelData.left, _parallelData.right, _parallelData.bottom, _parallelData.top, _parallelData.zNear, _parallelData.zFar);
+		projectionMatrix = glm::ortho(m_parallelData.left, m_parallelData.right, m_parallelData.bottom, m_parallelData.top, m_parallelData.zNear, m_parallelData.zFar);
 	}
 	return projectionMatrix;
 }
@@ -33,7 +33,8 @@ glm::mat4 Camera::projectionMatrix()
 glm::mat4 Camera::mvMatrix()
 {
 	glm::mat4 viewMatrix = attitudeMatrix();
-	viewMatrix *= glm::translate(glm::mat4(1), _position);
+
+	viewMatrix *= glm::translate(glm::mat4(1), -m_position);
 
 	return viewMatrix;
 }
@@ -51,5 +52,5 @@ glm::mat4 Camera::lookAt(const glm::vec3& at)
 {
 	glm::vec4 up = attitudeMatrix() * glm::vec4(0, 1, 0, 1);
 	
-	return glm::lookAt(_position, at, up.xyz());
+	return glm::lookAt(m_position, at, up.xyz());
 }

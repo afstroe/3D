@@ -32,6 +32,9 @@
     <Filter Include="app">
       <UniqueIdentifier>{4167a4cf-6fc5-4f7f-8a60-6acd474d71f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="graphics\fbx">
+      <UniqueIdentifier>{f759a902-1c3f-40d1-8a1f-1bf97247312a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphics\opengl\opengl_ext.h">
@@ -61,6 +64,18 @@
     <ClInclude Include="graphics\camera.h">
       <Filter>graphics</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\fbx\fbxbuilder.h">
+      <Filter>graphics\fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opengl\material.h">
+      <Filter>graphics\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opengl\glm.h">
+      <Filter>graphics\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\palette.h">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="qt\canvas.cpp">
@@ -80,6 +95,12 @@
     </ClCompile>
     <ClCompile Include="graphics\camera.cpp">
       <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\fbx\fbxbuilder.cpp">
+      <Filter>graphics\fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opengl\material.cpp">
+      <Filter>graphics\opengl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

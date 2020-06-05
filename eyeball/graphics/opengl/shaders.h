@@ -10,7 +10,7 @@
 class Shader
 {
 public:
-  static Shader fromFiles(const char* vertexShader, const char* fragmentShader);
+  static std::unique_ptr<Shader> fromFiles(const char* vertexShader, const char* fragmentShader);
 
   ~Shader();
 
@@ -18,49 +18,67 @@ public:
   {
     unsigned int activeProgram = 0;
     glGetIntegerv(GL_CURRENT_PROGRAM, (GLint*)&activeProgram);
-    if (activeProgram != programID)
+    if (activeProgram != m_programID)
     {
-      glUseProgram(programID);
-    }    
+      glUseProgram(m_programID);      
+    }
   }
 
   static void detach()
-  {
+  {    
     glUseProgram(0);
   }
 
   Shader() :
-    programID(0)
+    m_programID(0)
   {
     ;
   }
 
   Shader& operator = (const Shader& rhs) 
   {
-    this->programID = rhs.programID;
-    const_cast<Shader&>(rhs).programID = 0;// otherwise will get deleted by the destructor
-    this->uniforms = std::move(rhs.uniforms);
+    this->m_programID = rhs.m_programID;
+    const_cast<Shader&>(rhs).m_programID = 0;// otherwise will get deleted by the destructor
+    this->m_uniforms = std::move(const_cast<Shader&>(rhs).m_uniforms);
     return *this;
   }
 
   template<typename FunctionType, typename... Args>
   void set(const char* uniform, FunctionType function, Args... args)
   {
-    attach();    
-    function(uniforms[uniform], args...);
+    attach();
+    auto uniformite = m_uniforms.find(uniform);
+    int location = -1;
+    if (uniformite == m_uniforms.end())
+    {
+      location = glGetUniformLocation(m_programID, uniform);      
+      m_uniforms[uniform] = location;
+
+      if (location == -1)
+      {
+        debugLog("(!) Uniform % not found in the shader", uniform);
+      }
+    }
+    else
+    {
+      location = (*uniformite).second;
+    }
+
+    function(location, args...);    
     OPENGL_CHECK_ERROR();
   }
 
-protected:
-  Shader(GLuint _programID, std::unordered_map<std::string, int>& _uniforms) :
-    programID(_programID)  
+  Shader(GLuint programID, std::unordered_map<std::string, int>& uniforms) :
+    m_programID(programID)  
   {
-    uniforms = std::move(_uniforms);
-  }  
+    m_uniforms = std::move(uniforms);
+  }
+
+  void construct(const char* vertexShader, const char* fragmentShader);
 
 protected:
-  GLuint programID;
-  std::unordered_map<std::string, int> uniforms;
+  GLuint m_programID;
+  std::unordered_map<std::string, int> m_uniforms;
 };
 
 #endif // !__SHADERS_H__

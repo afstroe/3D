@@ -9,19 +9,30 @@
 #include <gl/GL.h>
 #include <vector>
 #include <eyeball/graphics/opengl/opengl_ext.h>
-#include <eyeball/graphics/opengl/shaders.h>
+#include <eyeball/graphics/opengl/material.h>
+#include <eyeball/graphics/opengl/glm.h>
+#include <eyeball/graphics/camera.h>
+
 
 class Geometry
 {
 public:
   template <typename Type>
-  struct Point2 {
+  struct Point3 {
     Type x;
     Type y;
-    Point2()
+    Type z;
+    Point3()
     {
       x = 0;
       y = 0;
+      z = 0;
+    }
+    Point3(Type x, Type y, Type z)
+    {
+      this->x = x;
+      this->y = y;
+      this->z = z;
     }
   };
 
@@ -32,40 +43,59 @@ public:
     GLuint faceMode = GL_FRONT;
   };
 
-  DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(std::vector<Point2<float>>, vertices);
+  DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(std::vector<Point3<float>>, vertices);
+  DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(std::vector<Point3<float>>, normals);
 
   DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(std::vector<int>, indices);
   DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(size_t, numTriangles);
   DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(Mode, mode);
-  DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(Shader, material);
+  DECLARE_SHARED_POINTER(protected, Material, material);
 
   GLuint vertexBuffer = 0;
+  GLuint normalBuffer = 0;
   GLuint indexBuffer = 0;
 
 
   Geometry() :
-    _numTriangles(0)
+    m_numTriangles(0)
   {
     ;
   }
 
   inline void bind()
   {
+    glEnableClientState(GL_VERTEX_ARRAY);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);    
 
-    _material.attach();
+    m_material->shader()->attach();
   }
 
   void createBuffers();
 
-  void draw();
+  void preDraw();
 
-  void drawImmediate();
+  void draw(const Camera& camera);
 
-  void materialFromFiles(const char* vertexShader, const char* fragmentShader);
+  void postDraw();
+
+  void drawImmediate();  
 
   ~Geometry();
+};
+
+class PositionedGeometry : public Geometry
+{
+  DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(glm::mat4, transform);
+public:
+  PositionedGeometry() :
+    Geometry()
+  , m_transform(glm::mat4(1))
+  {
+    ;
+  }
+
+  void draw(const Camera& camera);
 };
 
 

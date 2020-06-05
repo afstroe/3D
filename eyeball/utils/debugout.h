@@ -36,6 +36,7 @@ inline void debugLog(const char* format, T value, Targs... Fargs)
 inline void debugLog(const char* format)
 {
   OutputDebugStringA(format);
+  OutputDebugStringA("\n");
 }
 
 #endif // !__DEBUG_OUT_H__

@@ -2,8 +2,6 @@
 
 in float fa;
 
-uniform mat4 mvpMatrix;
-
 // output
 layout (location = 0) out vec4 color;
 

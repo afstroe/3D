@@ -47,33 +47,33 @@ public:
 
   inline const float& heading() const
   {
-    return _attitude.y;
+    return m_attitude.y;
   }
   inline float& heading()
   {
-    return _attitude.y;
+    return m_attitude.y;
   }
 
   inline const float& pitch() const
   {
-    return _attitude.x;
+    return m_attitude.x;
   }
   inline float& pitch()
   {
-    return _attitude.x;
+    return m_attitude.x;
   }
 
   inline const float& roll() const
   {
-    return _attitude.z;
+    return m_attitude.z;
   }
   inline float& roll()
   {
-    return _attitude.z;
+    return m_attitude.z;
   }
 
   inline Camera():
-    _mode(Mode::ORTHO)
+    m_mode(Mode::ORTHO)
   {
 
   }

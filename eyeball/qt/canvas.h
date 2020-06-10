@@ -32,6 +32,8 @@ protected:
 protected:
   std::thread paintTrigger;
   std::promise<void> exitSignal;
+
+  HDC m_hDC;
 };
 
 #endif // !__CANVAS_H__

@@ -49,5 +49,10 @@ inline bool haveOpenGLContext()
   return wglGetCurrentContext() != NULL;
 }
 
+inline void resetOpenGLError()
+{
+  glGetError();
+}
+
 #endif // !__OPENGL_UTILS_H__
 

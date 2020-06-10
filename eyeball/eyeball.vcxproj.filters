@@ -35,6 +35,9 @@
     <Filter Include="graphics\fbx">
       <UniqueIdentifier>{f759a902-1c3f-40d1-8a1f-1bf97247312a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="graphics\opencv">
+      <UniqueIdentifier>{604d4d74-0412-452f-a53d-865269b8a3ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphics\opengl\opengl_ext.h">
@@ -76,6 +79,21 @@
     <ClInclude Include="utils\palette.h">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\opengl\typewriter.h">
+      <Filter>graphics\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\enum.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opencv\opencvLink.h">
+      <Filter>graphics\opencv</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\paths.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\opencv\imageToTexture.h">
+      <Filter>graphics\opencv</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="qt\canvas.cpp">
@@ -101,6 +119,15 @@
     </ClCompile>
     <ClCompile Include="graphics\opengl\material.cpp">
       <Filter>graphics\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opengl\typewriter.cpp">
+      <Filter>graphics\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\paths.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\opencv\imageToTexture.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

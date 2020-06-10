@@ -34,6 +34,66 @@ public:
       this->y = y;
       this->z = z;
     }
+    Point3& operator += (const Point3& rhs)
+    {
+      x += rhs.x;
+      y += rhs.y;
+      z += rhs.z;
+
+      return *this;
+    }
+    void normalize() 
+    {
+      Type length_ = static_cast<Type>(1.0 / length());
+
+      x *= length_;
+      y *= length_;
+      z *= length_;
+    }
+    Type length()
+    {
+      return static_cast<Type>(std::sqrt(x * x + y * y + z * z));
+    }
+  };
+
+  template <typename Type>
+  struct Point2
+  {
+    Type x;
+    Type y;
+
+    Point2()
+    {
+      x = 0;
+      y = 0;
+    }
+
+    Point2(Type x, Type y)
+    {
+      this->x = x;
+      this->y = y;
+    }
+
+    Point2(const Point2& rhs)
+    {
+      x = rhs.x;
+      y = rhs.y;
+    }
+
+    Type length()
+    {
+      return std::sqrt(x * x + y * y);
+    }
+
+    bool operator == (const Point2& rhs)
+    {
+      return rhs.x == x && rhs.y == y;
+    }
+
+    bool operator != (const Point2& rhs)
+    {
+      return !(*this == rhs);
+    }
   };
 
   struct Mode
@@ -45,6 +105,7 @@ public:
 
   DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(std::vector<Point3<float>>, vertices);
   DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(std::vector<Point3<float>>, normals);
+  DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(std::vector<Point2<float>>, textureCoordinates);
 
   DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(std::vector<int>, indices);
   DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(size_t, numTriangles);
@@ -53,8 +114,8 @@ public:
 
   GLuint vertexBuffer = 0;
   GLuint normalBuffer = 0;
-  GLuint indexBuffer = 0;
-
+  GLuint textureCoordinatesBuffer = 0;
+  GLuint indexBuffer = 0; 
 
   Geometry() :
     m_numTriangles(0)
@@ -96,6 +157,10 @@ public:
   }
 
   void draw(const Camera& camera);
+
+protected:
+  void drawNormals(const Camera& camera);
+
 };
 
 

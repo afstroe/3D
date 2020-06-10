@@ -17,6 +17,8 @@
 #include <eyeball/graphics/camera.h>
 #include <eyeball/graphics/fbx/fbxbuilder.h>
 #include <eyeball/utils/palette.h>
+#include <eyeball/graphics/opengl/typewriter.h>
+#include <eyeball/app/appglobalstate.h>
 
 Canvas::Canvas(QWidget* parent)
 {
@@ -38,6 +40,7 @@ enum class ShaderKeys
   Num
 };
 Palette<Shader> shaderPalette;
+
 
 void Canvas::initializeGL()
 {  
@@ -84,12 +87,14 @@ void Canvas::initializeGL()
 
 
   camera.mode() = Camera::Mode::PERSPECTIVE;
-  camera.position() = glm::vec3(0, 0, 2);  
+  camera.position() = glm::vec3(0, 1, 200);  
 
 
   FbxBuilder b;
   
-  b.load("res/models/free/freida.FBX", fbxGeometry);
+  //b.load("res/models/free/freida-mod.FBX", fbxGeometry, true);  
+  b.load("res/models/chibi-avatar/Chibi-Avatar.FBX", fbxGeometry);
+
   shaderPalette.add(static_cast<int>(ShaderKeys::Material), Shader::fromFiles("shaders/compiled/material.vert", "shaders/compiled/material.frag"));
 
   for (auto* fbxg : fbxGeometry)
@@ -107,17 +112,29 @@ void Canvas::initializeGL()
     }, std::move(exitSignal.get_future()));
   paintTrigger.detach();
 
+  auto hWnd = reinterpret_cast<HWND>(effectiveWinId());
+  m_hDC = ::GetDC(hWnd);
+
+  AppGlobalState::get().typeWriterFont().create(m_hDC, "Courier New", 16, FW_NORMAL, 0, 0, 0);
+
   grabKeyboard();
 }
 
 void Canvas::paintGL()
-{ 
+{
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
   static double y = -1;
   y > 1 ? y = -1 : y;
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0, 1, 0, 1, 0.0f, 1.0f);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  AppGlobalState::get().typeWriter().printf(&AppGlobalState::get().typeWriterFont(), Typewriter::Alignment::Whatever, Typewriter::SpecialEffects::None, 0, 0, 0, 0.1f, 0.1f, "Test");
 
   auto viewMatrix = camera.transform();
 
@@ -127,7 +144,7 @@ void Canvas::paintGL()
   auto modelViewMatrix = camera.mvMatrix() * myBall.transform();
   myBall.material()->shader()->set("modelViewMatrix", glUniformMatrix4fv, 1, GL_FALSE, glm::value_ptr(modelViewMatrix));
 
-  // glOrtho(-0.5, 0.5, -0.5, 0.5, 0.0f, 1.0f);
+  
   
   glDisable(GL_TEXTURE_2D);
 
@@ -136,7 +153,13 @@ void Canvas::paintGL()
   for (auto* geometry : fbxGeometry)
   {
     geometry->material()->shader()->set("projectionMatrix", glUniformMatrix4fv, 1, GL_FALSE, glm::value_ptr(camera.projectionMatrix()));
-    modelViewMatrix = camera.mvMatrix() * glm::rotate(glm::mat4(1), glm::radians(-90.0f), glm::vec3(0, 1, 0));// geometry->transform();
+    
+    //!! TODO: Remove the hard-coded transform
+    // geometry->transform() = glm::mat4(1);// glm::rotate(glm::mat4(1), glm::radians(-90.0f), glm::vec3(0, 1, 0));
+    auto transform = geometry->transform() * glm::rotate(glm::mat4(1), glm::radians(-90.0f), glm::vec3(1, 0, 0));
+    
+    
+    modelViewMatrix = camera.mvMatrix() * transform;
     geometry->material()->shader()->set("modelViewMatrix", glUniformMatrix4fv, 1, GL_FALSE, glm::value_ptr(modelViewMatrix));
 
     glColor3f(1.0f, 1.0f, 0.0f);
@@ -182,6 +205,8 @@ void Canvas::resizeGL(int w, int h)
 void Canvas::closeEvent(QCloseEvent* event)
 {
   UNREFERENCED_PARAMETER(event);
+
+  ReleaseDC(reinterpret_cast<HWND>(effectiveWinId()), m_hDC);
 
   // set the signal to exit the clock thread
   exitSignal.set_value();

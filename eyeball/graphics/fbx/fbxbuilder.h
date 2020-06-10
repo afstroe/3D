@@ -7,9 +7,9 @@
 class FbxBuilder
 {
 public:
-  void load(const char* fileName, std::vector<PositionedGeometry*>& fbxGeometry);
+  void load(const char* fileName, std::vector<PositionedGeometry*>& fbxGeometry, bool triangulate = false);
 protected:
-  void parseScene(FbxScene* scene, std::vector<PositionedGeometry*>& fbxGeometry);
+  void parseScene(FbxScene* scene, std::vector<PositionedGeometry*>& fbxGeometry, FbxGeometryConverter& geometryConverter);
   ;
 };
 

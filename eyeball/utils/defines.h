@@ -60,6 +60,22 @@
     */                                                                \
   inline const std::shared_ptr<TYPE> NAME() const { return m_##NAME; }
 
+#define DECLARE_TRIVIAL_ATTRIBUTE(ACCESS, TYPE, NAME)       \
+  ACCESS:                                                   \
+    TYPE m_##NAME;                                          \
+  public:                                                   \
+    /*! <br>                                                \
+      \brief getter / setter for _##NAME <br>               \
+      \return a reference to _##NAME <br>                   \
+      */                                                    \
+    inline TYPE& NAME() { return m_##NAME; }                \
+                                                            \
+  /*! <br>                                                  \
+    \brief getter for _##NAME <br>                          \
+    \return a constant reference to _##NAME <br>            \
+    */                                                      \
+  inline const TYPE& NAME() const { return m_##NAME; }
+
 static const size_t BENCHMARK_ITERATIONS = 1000;
 static const size_t BENCHMARK_PROBLEM_SIZE = 2;
 

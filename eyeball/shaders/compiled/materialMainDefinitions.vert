@@ -11,3 +11,4 @@ uniform mat4 modelMatrix;
 
 out vec3 normalToFragment;
 out vec3 positionToFragment;
+out vec2 textureCoordinatesToFragment;

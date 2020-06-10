@@ -3,7 +3,7 @@
 
 
 
-glm::mat4 Camera::transform()
+glm::mat4 Camera::transform() const
 {
 	glm::mat4 projMatrix = projectionMatrix();
 	
@@ -14,7 +14,7 @@ glm::mat4 Camera::transform()
 	return projMatrix;
 }
 
-glm::mat4 Camera::projectionMatrix()
+glm::mat4 Camera::projectionMatrix() const
 {
 	glm::mat4 projectionMatrix;
 	switch (m_mode)
@@ -30,7 +30,7 @@ glm::mat4 Camera::projectionMatrix()
 	return projectionMatrix;
 }
 
-glm::mat4 Camera::mvMatrix()
+glm::mat4 Camera::mvMatrix() const
 {
 	glm::mat4 viewMatrix = attitudeMatrix();
 
@@ -39,7 +39,7 @@ glm::mat4 Camera::mvMatrix()
 	return viewMatrix;
 }
 
-glm::mat4 Camera::attitudeMatrix()
+glm::mat4 Camera::attitudeMatrix() const
 {
 	glm::mat4 attitudeMatrix = glm::rotate(glm::mat4(1), glm::radians(roll()), glm::vec3(0, 0, 1));
 	attitudeMatrix = glm::rotate(attitudeMatrix, glm::radians(pitch()), glm::vec3(1, 0, 0));

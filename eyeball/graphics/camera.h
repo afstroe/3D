@@ -78,10 +78,10 @@ public:
 
   }
 
-  glm::mat4 transform();
-  glm::mat4 projectionMatrix();
-  glm::mat4 mvMatrix();
-  glm::mat4 attitudeMatrix();  
+  glm::mat4 transform() const;
+  glm::mat4 projectionMatrix() const;
+  glm::mat4 mvMatrix() const;
+  glm::mat4 attitudeMatrix() const;  
   glm::mat4 lookAt(const glm::vec3& at);
 
 };

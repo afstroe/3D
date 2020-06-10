@@ -21,6 +21,10 @@ protected slots:
   
   void onActionRenderBothFaces();
 
+  void onActionDrawNormals();
+
+  void onActionRenderMonochrome();
+
 private:
     Ui::eyeballClass ui;
 };

@@ -47,6 +47,8 @@
     <addaction name="actionViewWireframe"/>
     <addaction name="actionViewSolidWireframe"/>
     <addaction name="actionRenderBothFaces"/>
+    <addaction name="actionDrawNormals"/>
+    <addaction name="actionRenderMonochrome"/>
    </widget>
    <addaction name="menuView"/>
   </widget>
@@ -92,6 +94,22 @@
    </property>
    <property name="text">
     <string>Render both faces</string>
+   </property>
+  </action>
+  <action name="actionDrawNormals">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Draw normals</string>
+   </property>
+  </action>
+  <action name="actionRenderMonochrome">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Render monochrome</string>
    </property>
   </action>
  </widget>

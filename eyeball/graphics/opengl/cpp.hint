@@ -6,3 +6,5 @@
 #define FOR(index, cap) for(auto index = 0; index < cap; ++index)
 #define DECLARE_PROTECTED_TRIVIAL_ATTRIBUTE(TYPE, NAME) protected: TYPE _##NAME; public: inline TYPE& NAME() { return _##NAME; } inline const TYPE& NAME() const { return _##NAME; }#define DECLARE_SHARED_POINTER(ACCESS, TYPE, NAME) ACCESS: std::shared_ptr<TYPE> m_##NAME; public: inline std::shared_ptr<TYPE>& NAME() { return m_##NAME; } inline const std::shared_ptr<TYPE> NAME() const { return m_##NAME; }
 #define DECLARE_SHARED_POINTER(ACCESS, TYPE, NAME) ACCESS: std::shared_ptr<TYPE> m_##NAME; public: inline std::shared_ptr<TYPE>& NAME() { return m_##NAME; } inline const std::shared_ptr<TYPE> NAME() const { return m_##NAME; }
+#define Enum(TypeName, FirstEnumerant, __VA_ARGS__) class TypeName { public: enum EnumType{ FirstEnumerant = 0, __VA_ARGS__, }m_enum; TypeName(){m_enum = FirstEnumerant;} TypeName(int enumerant){m_enum = static_cast<EnumType>(enumerant);} operator int(){return static_cast<int>(m_enum);}}
+#define DECLARE_PROTECTED_TRIVIAL_PTR_ATTRIBUTE(TYPE, NAME) protected: TYPE* m_##NAME; public: inline TYPE*& NAME() { return m_##NAME; } inline const TYPE* NAME() const { return m_##NAME; }

@@ -3,15 +3,12 @@
 
 #include <eyeball/utils/defines.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-#include <gl/GL.h>
 #include <vector>
 #include <eyeball/graphics/opengl/opengl_ext.h>
 #include <eyeball/graphics/opengl/material.h>
 #include <eyeball/graphics/opengl/glm.h>
 #include <eyeball/graphics/camera.h>
+#include <eyeball/graphics/opengl/incOpenGL.h>
 
 
 class Geometry

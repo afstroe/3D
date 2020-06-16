@@ -1,4 +1,5 @@
 #define GLSLIFY 1
+#define GLSLIFY 1
 vec4 wireframeColor()
 {
   return vec4(vec3(0.3), 1.0);
@@ -11,7 +12,7 @@ vec4 monochromeColor()
 
 vec4 phongLighting(Material material)
 {
-  vec3 light = vec3(0, 10, 0);
+  vec3 light = vec3(0, -10, 0);
 
   vec3 lightColor = vec3(1, 1, 1);
   vec3 position = positionToFragment;

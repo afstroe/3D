@@ -41,7 +41,7 @@ vec4 monochromeColor()
 
 vec4 phongLighting(Material material)
 {
-  vec3 light = vec3(0, 10, 10);
+  vec3 light = vec3(0, -2, -30);
 
   vec3 lightColor = vec3(1, 1, 1);
   vec3 position = positionToFragment;
@@ -64,14 +64,22 @@ vec4 phongLighting(Material material)
 
   // the diffuse and specular components for each fragment
   vec3 ambient = lightColor * ambientTexture.rgb;
-  vec3 diffuse = 2 * diffuseColor.rgb * max(dot(n, l), 0.0) * diffuseTexture.rgb;
+  vec3 diffuse = ((diffuseColor.rgb * min( max(dot(n, l), 0), 1.0 ))) * diffuseTexture.rgb;
   vec3 specular = pow(max(dot(r, v), 0.0), 1000.0) * lightColor * specularTexture.rgb;
 
-  // return vec4(textureCoordinatesToFragment, 0.0, 0.3);
+  // if(length(diffuseTexture.rgb) < 0.2)
+  // {
+  //   return vec4(1.0, 0.0, 0.0, 1.0);  
+  // }
+
+  // return vec4(diffuseTexture.rgb, 1.0);
 
   float alpha = (ambientTexture.a + diffuseTexture.a + specularTexture.a) * 0.33;
+  
+  // return vec4(abs(normal.x), abs(normal.y), abs(normal.z), 1.0);
+  // return vec4(textureCoordinatesToFragment.st, 1, 1);
 
-  return vec4((ambient * diffuse /*+ specular*/), alpha);
+  return vec4(2 * (ambient * diffuse) /*+ specular*/, alpha);
 }
 
 void main()

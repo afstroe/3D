@@ -3,6 +3,30 @@
 #include <eyeball/graphics/opencv/imageToTexture.h>
 #include <eyeball/graphics/opengl/glm.h>
 
+
+namespace {
+  std::string textureNameString(Material::TextureNames textureName)
+  {
+    switch (textureName)
+    {
+      case Material::TextureNames::NoName:
+        return "NoName";
+      case Material::TextureNames::Emissive:
+        return "Emissive";
+      case Material::TextureNames::Ambient:
+        return "Ambient";
+      case Material::TextureNames::Diffuse:
+        return "Diffuse";
+      case Material::TextureNames::Specular:
+        return "Specular";
+      
+      default:
+        return "";
+      break;
+    }
+  }
+}
+
 void Material::loadTextures()
 {
   for (TextureNames textureName = TextureNames::Emissive; textureName < TextureNames::Num; ++textureName)
@@ -34,6 +58,13 @@ void Material::preDraw()
       glActiveTexture(GL_TEXTURE0 + textureName - 1);
       glEnable(GL_TEXTURE_2D);
       glBindTexture(GL_TEXTURE_2D, tex);
+
+      if(0)
+      { 
+        auto textureString = textureNameString(textureName);
+        textureString = m_name + "_" + textureString;
+        ImageToTexture::dumpDebugOfTexture2D(tex, textureString.c_str());
+      }
 
       m_shader->set(texvar.str().c_str(), glUniform1i, textureName - 1);
     }

@@ -1,4 +1,5 @@
 set CRT_DIR=%cd%
+set DEBUG_DUMP_PATH=C:/Users/alinf/Desktop/dump/
 set OPENCV_LIB=C:\.alin\devel\OpenCV\_opencv\install
 set OPENCV_DLL=C:\.alin\devel\OpenCV\_opencv\bin\Debug;C:\.alin\devel\OpenCV\_opencv\bin\Release
 set LIBS_INC="%CRT_DIR%\libs\SDL\include";"%CRT_DIR%\libs\glm";"%CRT_DIR%";"%CRT_DIR%\libs\FBX\include";"%OPENCV_LIB%\include"

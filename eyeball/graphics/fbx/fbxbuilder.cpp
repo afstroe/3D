@@ -83,6 +83,7 @@ namespace {
     outMaterial->diffuse() = diffuse.first; outMaterial->textureFile(Material::TextureNames::Diffuse) = diffuse.second;
     outMaterial->specular() = specular.first; outMaterial->textureFile(Material::TextureNames::Specular) = specular.second;
     outMaterial->shininess() = shininess;
+    outMaterial->name() = material->GetName();
 
     return outMaterial;
   }
@@ -164,6 +165,11 @@ namespace {
 
     auto numPolys = mesh->GetPolygonCount();
 
+    int written = 0;
+
+    auto* uvElement = mesh->GetElementUV(0);
+    auto uvReferenceMode = uvElement->GetReferenceMode();
+
     FOR(poly, numPolys)
     {
       FbxVector2 uv;
@@ -175,19 +181,44 @@ namespace {
         {
           continue;
         }
-        mesh->GetPolygonVertexUV(poly, index, uvName, uv, unmapped);
-        if (unmapped)
+
+        if (uvReferenceMode == FbxLayerElement::eIndexToDirect)
         {
+          auto polyVertexIndex = mesh->GetPolygonVertexIndex(poly) + index;
+
+          auto ind = uvElement->GetIndexArray().GetAt(polyVertexIndex);
+          uv = uvElement->GetDirectArray().GetAt(ind);
+          
+          FbxVector2 uv2;
+          mesh->GetPolygonVertexUV(poly, index, uvName, uv2, unmapped);
+
           int a = 0;
         }
-
-        if (textureCoordinates[indexInBuffer].length() == 0)
+        else
         {
-          textureCoordinates[indexInBuffer] = { 1 - static_cast<float>(uv[0]), static_cast<float>(uv[1]) };
+          mesh->GetPolygonVertexUV(poly, index, uvName, uv, unmapped);
+          if (unmapped)
+          {
+            int a = 0;
+          }
+        }
+
+        if (1/*textureCoordinates[indexInBuffer].length() == 0*/)
+        {
+          //double ip = 0;
+          //float s = modf(static_cast<double>(uv[0]), &ip);
+          //float t = modf(static_cast<double>(uv[1]), &ip);
+          //s = s < 0 ? 1 + s : s;
+          //t = t < 0 ? 1 + t : t;
+
+          //textureCoordinates[indexInBuffer] = { 1 - s, t };
+          textureCoordinates[indexInBuffer] = { static_cast<float>(uv[0]), static_cast<float>(1 - uv[1]) };
+          written++;
         }
 
         //textureCoordinates[indexInBuffer] = { 1 - static_cast<float>(uv[0]), static_cast<float>(uv[1]) };
-      }
+
+      }      
     }
   }
 
@@ -200,7 +231,7 @@ namespace {
       return;
     }
     
-    auto uvMappingMode = mesh->GetElementUV(0)->GetMappingMode();
+    auto uvMappingMode = mesh->GetElementUV(0)->GetMappingMode();    
 
     textureCoordinates.resize(numIndices);
 
@@ -401,6 +432,8 @@ void FbxBuilder::parseScene(FbxScene* scene, std::vector<PositionedGeometry*>& f
                                 data[0].mData[2], data[1].mData[2], data[2].mData[2], data[3].mData[2], 
                                 data[0].mData[3], data[1].mData[3], data[2].mData[3], data[3].mData[3]);
 
+      transformMatrix = glm::mat4(1);// topOfStack.accumulatedMatrix * transformMatrix;
+
       parseStack.push({ 0, topOfStack.node->GetChild(topOfStack.lastParsedChildIdx), transformMatrix });
       topOfStack.lastParsedChildIdx++;
     }
@@ -416,11 +449,22 @@ void FbxBuilder::parseScene(FbxScene* scene, std::vector<PositionedGeometry*>& f
         {
           case FbxNodeAttribute::eMesh:
           {
-            auto* mesh = static_cast<FbxMesh*>(attribute);            
-            //geometryConverter.ComputeEdgeSmoothingFromNormals(mesh);
-            //mesh->GenerateNormals(true);
-            //geometryConverter.EmulateNormalsByPolygonVertex(mesh);
+            if (strstr(name, "pony") || strstr(name, "Eye"))
+            {
+              int a = 0;
+            }
 
+            FbxAMatrix& globalTransform = topOfStack.node->EvaluateGlobalTransform(0);
+            auto& data = globalTransform.mData;
+
+            glm::mat4 transformMatrix(data[0].mData[0], data[1].mData[0], data[2].mData[0], data[3].mData[0],
+              data[0].mData[1], data[1].mData[1], data[2].mData[1], data[3].mData[1],
+              data[0].mData[2], data[1].mData[2], data[2].mData[2], data[3].mData[2],
+              data[0].mData[3], data[1].mData[3], data[2].mData[3], data[3].mData[3]);
+            
+            transformMatrix = glm::mat4(1);// topOfStack.accumulatedMatrix * transformMatrix;
+
+            auto* mesh = static_cast<FbxMesh*>(attribute);
 
             std::vector<Geometry::Point3<float>> geometryVertices;
             getMeshVertexPool(mesh, geometryVertices);
@@ -442,10 +486,10 @@ void FbxBuilder::parseScene(FbxScene* scene, std::vector<PositionedGeometry*>& f
             }
 
             std::vector<Geometry::Point3<float>> normals;
-            decodeNormals(mesh, normals, geometryVertices.size(), 4);
+            decodeNormals(mesh, normals, geometryVertices.size(), 3);
 
             std::vector<Geometry::Point2<float>> textureCoordinates;
-            decodeTextureCoordinates(mesh, textureCoordinates, geometryVertices.size(), 4);
+            decodeTextureCoordinates(mesh, textureCoordinates, geometryVertices.size(), 3);
             
             renderGeometry3->vertices() = geometryVertices;
             renderGeometry3->indices() = std::move(geometryIndices);
@@ -453,7 +497,7 @@ void FbxBuilder::parseScene(FbxScene* scene, std::vector<PositionedGeometry*>& f
             renderGeometry3->textureCoordinates() = std::move(textureCoordinates);
 
             renderGeometry3->createBuffers();
-            renderGeometry3->transform() = topOfStack.accumulatedMatrix;
+            renderGeometry3->transform() = transformMatrix;
             renderGeometry3->mode() = { GL_TRIANGLES, GL_FILL, GL_FRONT };
             fbxGeometry.push_back(renderGeometry3);
 
@@ -473,7 +517,7 @@ void FbxBuilder::parseScene(FbxScene* scene, std::vector<PositionedGeometry*>& f
               renderGeometry4->textureCoordinates() = std::move(textureCoordinates);
 
               renderGeometry4->createBuffers();
-              renderGeometry4->transform() = topOfStack.accumulatedMatrix;
+              renderGeometry4->transform() = transformMatrix;
               renderGeometry4->mode() = { GL_QUADS, GL_FILL, GL_FRONT };
               fbxGeometry.push_back(renderGeometry4);
             }

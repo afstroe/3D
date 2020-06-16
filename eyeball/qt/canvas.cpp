@@ -93,7 +93,9 @@ void Canvas::initializeGL()
   FbxBuilder b;
   
   //b.load("res/models/free/freida-mod.FBX", fbxGeometry, true);  
-  b.load("res/models/chibi-avatar/Chibi-Avatar.FBX", fbxGeometry);
+  // FbxBuilder().load("res/models/chibi-avatar/Chibi-Avatar.FBX", fbxGeometry);
+  // FbxBuilder().load("C:\\Users\\alinf\\Desktop\\ponzy\\ponzy.fbx", fbxGeometry, true);
+  FbxBuilder().load("C:\\Users\\alinf\\Desktop\\cubu\\cubu.fbx", fbxGeometry, false);
 
   shaderPalette.add(static_cast<int>(ShaderKeys::Material), Shader::fromFiles("shaders/compiled/material.vert", "shaders/compiled/material.frag"));
 
@@ -156,10 +158,10 @@ void Canvas::paintGL()
     
     //!! TODO: Remove the hard-coded transform
     // geometry->transform() = glm::mat4(1);// glm::rotate(glm::mat4(1), glm::radians(-90.0f), glm::vec3(0, 1, 0));
-    auto transform = geometry->transform() * glm::rotate(glm::mat4(1), glm::radians(-90.0f), glm::vec3(1, 0, 0));
+    auto transform = glm::rotate(glm::mat4(1), glm::radians(-90.0f), glm::vec3(1, 0, 0));
     
     
-    modelViewMatrix = camera.mvMatrix() * transform;
+    modelViewMatrix = camera.mvMatrix();// *transform;//  geometry->transform();
     geometry->material()->shader()->set("modelViewMatrix", glUniformMatrix4fv, 1, GL_FALSE, glm::value_ptr(modelViewMatrix));
 
     glColor3f(1.0f, 1.0f, 0.0f);
@@ -217,12 +219,12 @@ void Canvas::keyPressEvent(QKeyEvent* event)
   switch (event->key())
   {
     case Qt::Key_Up:
-      camera.position().z -= 0.1f * cos(glm::radians(-camera.heading()));
-      camera.position().x -= 0.1f * sin(glm::radians(-camera.heading()));
+      camera.position().z -= 1.1f * cos(glm::radians(-camera.heading()));
+      camera.position().x -= 1.1f * sin(glm::radians(-camera.heading()));
     break;   
     case Qt::Key_Down:
-      camera.position().z += 0.1f * cos(glm::radians(-camera.heading()));
-      camera.position().x += 0.1f * sin(glm::radians(-camera.heading()));
+      camera.position().z += 1.1f * cos(glm::radians(-camera.heading()));
+      camera.position().x += 1.1f * sin(glm::radians(-camera.heading()));
       break;
     case Qt::Key_Left:
       if (event->modifiers() & Qt::ShiftModifier)
@@ -271,13 +273,13 @@ void Canvas::keyPressEvent(QKeyEvent* event)
     case Qt::Key_9:
       if (event->modifiers() & Qt::KeypadModifier)
       {
-        camera.position().y += 0.1f;
+        camera.position().y += 1.1f;
       }
     break;   
     case Qt::Key_3:
       if (event->modifiers() & Qt::KeypadModifier)
       {
-        camera.position().y -= 0.1f;
+        camera.position().y -= 1.1f;
       }
     break;
   }

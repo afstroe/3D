@@ -92,9 +92,9 @@ void Canvas::initializeGL()
 
   FbxBuilder b;
   
-  FbxBuilder().load("res/models/free/freida-mod.FBX", fbxGeometry);
+  // FbxBuilder().load("res/models/free/freida-mod.FBX", fbxGeometry);
   // FbxBuilder().load("res/models/chibi-avatar/Chibi-Avatar.FBX", fbxGeometry);
-  // FbxBuilder().load("C:\\Users\\alinf\\Desktop\\ponzy\\ponzy.fbx", fbxGeometry);
+  FbxBuilder().load("C:\\Users\\alinf\\Desktop\\ponzy\\ponzy.fbx", fbxGeometry);
   // FbxBuilder().load("C:\\Users\\alinf\\Desktop\\cubu\\cubu.fbx", fbxGeometry);
 
   shaderPalette.add(static_cast<int>(ShaderKeys::Material), Shader::fromFiles("shaders/compiled/material.vert", "shaders/compiled/material.frag"));

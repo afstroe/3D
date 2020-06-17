@@ -1,4 +1,5 @@
 #include <stack>
+#include <unordered_set>
 
 #include "../opengl/glm.h"
 
@@ -316,9 +317,110 @@ namespace {
       }
     }
   }
+
+  void getVertexData(FbxMesh* mesh, std::vector<Geometry::Vertex>& vertexData, std::vector<int>& indexBuffer)
+  {    
+    auto numPolys = mesh->GetPolygonCount();
+    auto numTris = numPolygons(mesh, 3);
+
+    // Bit of a sanity check
+    if (numPolys == numTris)
+    {
+      debugLog("Mesh % contains N-gons", mesh->GetName());
+    }
+
+    indexBuffer.resize(numPolys * 3);
+
+    auto hasUV = mesh->GetElementUVCount() > 0;
+
+    const char* uvName = nullptr;
+    if (hasUV)
+    {
+      FbxStringList uvNames;
+      mesh->GetUVSetNames(uvNames);
+
+      if (uvNames.GetCount())
+      {
+        uvName = uvNames[0];
+      }
+    }
+ 
+    // worst case scenario
+    // each face has separate polygons
+    std::unordered_set<Geometry::Vertex, Geometry::Vertex::Hash> vertexDataMap;
+
+    // the fbx mesh's vertex pool
+    auto* fbxVertexCache = mesh->GetControlPoints();
+  
+    Geometry::Point3<float> position;
+    Geometry::Point3<float> normal;
+    Geometry::Point2<float> textureCoordinates;
+
+    FbxVector4 fbxNormal;
+    FbxVector2 fbxUV;
+    bool unmapped = false;
+
+    Geometry::Vertex cvertex;
+
+    // iterate through the polygons
+    // find the vertex in the fbx mesh vertex pool
+    // see if we already have it in our data map
+    size_t indexInVB = 0;
+    size_t indexInIB = 0;
+    FOR(poly, numPolys)
+    {
+      FOR(index, 3)
+      {
+        fbxNormal.Set(0, 0, 0);
+        fbxUV.Set(0, 0);       
+        position.set(0, 0, 0);
+        normal.set(0, 0, 0);
+        textureCoordinates.set(0, 0);
+
+        auto i = mesh->GetPolygonVertex(poly, index);
+        position.x = static_cast<float>(fbxVertexCache[i][0]);
+        position.y = static_cast<float>(fbxVertexCache[i][1]);
+        position.z = static_cast<float>(fbxVertexCache[i][2]);
+
+        if (mesh->GetPolygonVertexNormal(poly, index, fbxNormal))
+        {
+          normal.set(static_cast<float>(fbxNormal[0]), static_cast<float>(fbxNormal[1]), static_cast<float>(fbxNormal[2]));
+        }
+        if (mesh->GetPolygonVertexUV(poly, index, uvName, fbxUV, unmapped))
+        {
+          textureCoordinates.set(static_cast<float>(fbxUV[0]), static_cast<float>(1 - fbxUV[1]));
+        }
+
+        cvertex.position = position;
+        cvertex.normal = normal;
+        cvertex.textureCoordinates = textureCoordinates;
+        cvertex.index = indexInVB;
+
+        auto ite = vertexDataMap.find(cvertex);
+
+        if (ite == vertexDataMap.end())
+        {
+          vertexDataMap.insert(cvertex);
+          indexBuffer[indexInIB++] = static_cast<int>(indexInVB++);
+        }
+        else
+        {
+          indexBuffer[indexInIB++] = static_cast<int>((*ite).index);
+        }
+
+        int a = 0;
+      }
+    }
+
+    vertexData.resize(vertexDataMap.size());
+    for (auto& v : vertexDataMap)
+    {
+      vertexData[v.index] = v;
+    }
+  }
 }
 
-void FbxBuilder::load(const char* fileName, std::vector<PositionedGeometry*>& fbxGeometry, bool triangulate/* = false*/)
+void FbxBuilder::load(const char* fileName, std::vector<PositionedGeometry*>& fbxGeometry)
 {
   // Create the FBX SDK manager
   auto* fbxManager = FbxManager::Create();
@@ -374,15 +476,14 @@ void FbxBuilder::load(const char* fileName, std::vector<PositionedGeometry*>& fb
 
     // Convert mesh, NURBS and patch into triangle mesh
     FbxGeometryConverter geomConverter(fbxManager);
-    if (triangulate)
+
+    try 
     {
-      try {
-        geomConverter.Triangulate(scene, /*replace*/true);
-      }
-      catch (std::runtime_error) {
-        debugLog("Scene integrity verification failed.\n");
-        return;
-      }
+      geomConverter.Triangulate(scene, true);
+    }
+    catch (std::runtime_error) {
+      debugLog("Scene integrity verification failed.\n");
+      return;
     }
 
     parseScene(scene, fbxGeometry, geomConverter);
@@ -449,78 +550,111 @@ void FbxBuilder::parseScene(FbxScene* scene, std::vector<PositionedGeometry*>& f
         {
           case FbxNodeAttribute::eMesh:
           {
-            if (strstr(name, "pony") || strstr(name, "Eye"))
-            {
-              int a = 0;
-            }
-
-            FbxAMatrix& globalTransform = topOfStack.node->EvaluateGlobalTransform(0);
-            auto& data = globalTransform.mData;
-
-            glm::mat4 transformMatrix(data[0].mData[0], data[1].mData[0], data[2].mData[0], data[3].mData[0],
-              data[0].mData[1], data[1].mData[1], data[2].mData[1], data[3].mData[1],
-              data[0].mData[2], data[1].mData[2], data[2].mData[2], data[3].mData[2],
-              data[0].mData[3], data[1].mData[3], data[2].mData[3], data[3].mData[3]);
-            
-            transformMatrix = glm::mat4(1);// topOfStack.accumulatedMatrix * transformMatrix;
-
             auto* mesh = static_cast<FbxMesh*>(attribute);
+            std::vector<Geometry::Vertex> vertexData;
+            std::vector<int> indexBuffer;
+            getVertexData(mesh, vertexData, indexBuffer);
 
-            std::vector<Geometry::Point3<float>> geometryVertices;
-            getMeshVertexPool(mesh, geometryVertices);
-
-            
-            std::vector<int> geometryIndices;
-            getIndexPool(mesh, geometryIndices, 3);
+            auto* renderGeometry = new PositionedGeometry;
 
             auto numMaterials = topOfStack.node->GetMaterialCount();
-
-            auto* renderGeometry3 = new PositionedGeometry;
-
-            // only supporting one material for now
             if(numMaterials > 0)
             {
               const auto* fbxMaterial = topOfStack.node->GetMaterial(0);
 
-              renderGeometry3->material() = decodeMaterial(fbxMaterial);
+              renderGeometry->material() = decodeMaterial(fbxMaterial);
             }
-
-            std::vector<Geometry::Point3<float>> normals;
-            decodeNormals(mesh, normals, geometryVertices.size(), 3);
-
-            std::vector<Geometry::Point2<float>> textureCoordinates;
-            decodeTextureCoordinates(mesh, textureCoordinates, geometryVertices.size(), 3);
+            renderGeometry->vertices().resize(vertexData.size());
+            renderGeometry->normals().resize(vertexData.size());
+            renderGeometry->textureCoordinates().resize(vertexData.size());
             
-            renderGeometry3->vertices() = geometryVertices;
-            renderGeometry3->indices() = std::move(geometryIndices);
-            renderGeometry3->normals() = std::move(normals);
-            renderGeometry3->textureCoordinates() = std::move(textureCoordinates);
-
-            renderGeometry3->createBuffers();
-            renderGeometry3->transform() = transformMatrix;
-            renderGeometry3->mode() = { GL_TRIANGLES, GL_FILL, GL_FRONT };
-            fbxGeometry.push_back(renderGeometry3);
-
-            getIndexPool(mesh, geometryIndices, 4);
-
-            if (geometryIndices.size() > 0)
+            size_t index = 0;
+            for (const auto& v : vertexData)
             {
-              decodeNormals(mesh, normals, geometryVertices.size(), 4);
-              decodeTextureCoordinates(mesh, textureCoordinates, geometryVertices.size(), 4);
-
-
-              auto* renderGeometry4 = new PositionedGeometry;
-              renderGeometry4->vertices() = std::move(geometryVertices);
-              renderGeometry4->indices() = std::move(geometryIndices);
-              renderGeometry4->material() = renderGeometry3->material();
-              renderGeometry4->normals() = std::move(normals);
-              renderGeometry4->textureCoordinates() = std::move(textureCoordinates);
-
-              renderGeometry4->createBuffers();
-              renderGeometry4->transform() = transformMatrix;
-              renderGeometry4->mode() = { GL_QUADS, GL_FILL, GL_FRONT };
-              fbxGeometry.push_back(renderGeometry4);
+              renderGeometry->vertices()[index] = v.position;
+              renderGeometry->normals()[index] = v.normal;
+              renderGeometry->textureCoordinates()[index++] = v.textureCoordinates;
             }
+            renderGeometry->indices() = std::move(indexBuffer);
+
+            renderGeometry->createBuffers();
+
+            fbxGeometry.push_back(renderGeometry);
+
+
+
+            //if (strstr(name, "pony") || strstr(name, "Eye"))
+            //{
+            //  int a = 0;
+            //}
+
+            //FbxAMatrix& globalTransform = topOfStack.node->EvaluateGlobalTransform(0);
+            //auto& data = globalTransform.mData;
+
+            //glm::mat4 transformMatrix(data[0].mData[0], data[1].mData[0], data[2].mData[0], data[3].mData[0],
+            //  data[0].mData[1], data[1].mData[1], data[2].mData[1], data[3].mData[1],
+            //  data[0].mData[2], data[1].mData[2], data[2].mData[2], data[3].mData[2],
+            //  data[0].mData[3], data[1].mData[3], data[2].mData[3], data[3].mData[3]);
+            //
+            //transformMatrix = glm::mat4(1);// topOfStack.accumulatedMatrix * transformMatrix;
+
+            //auto* mesh = static_cast<FbxMesh*>(attribute);
+
+            //std::vector<Geometry::Point3<float>> geometryVertices;
+            //getMeshVertexPool(mesh, geometryVertices);
+
+            //
+            //std::vector<int> geometryIndices;
+            //getIndexPool(mesh, geometryIndices, 3);
+
+            //auto numMaterials = topOfStack.node->GetMaterialCount();
+
+            //auto* renderGeometry3 = new PositionedGeometry;
+
+            //// only supporting one material for now
+            //if(numMaterials > 0)
+            //{
+            //  const auto* fbxMaterial = topOfStack.node->GetMaterial(0);
+
+            //  renderGeometry3->material() = decodeMaterial(fbxMaterial);
+            //}
+
+            //std::vector<Geometry::Point3<float>> normals;
+            //decodeNormals(mesh, normals, geometryVertices.size(), 3);
+
+            //std::vector<Geometry::Point2<float>> textureCoordinates;
+            //decodeTextureCoordinates(mesh, textureCoordinates, geometryVertices.size(), 3);
+            //
+            //renderGeometry3->vertices() = geometryVertices;
+            //renderGeometry3->indices() = std::move(geometryIndices);
+            //renderGeometry3->normals() = std::move(normals);
+            //renderGeometry3->textureCoordinates() = std::move(textureCoordinates);
+
+            //renderGeometry3->createBuffers();
+            //renderGeometry3->transform() = transformMatrix;
+            //renderGeometry3->mode() = { GL_TRIANGLES, GL_FILL, GL_FRONT };
+            //fbxGeometry.push_back(renderGeometry3);
+
+            //getIndexPool(mesh, geometryIndices, 4);
+
+            //if (geometryIndices.size() > 0)
+            //{
+            //  decodeNormals(mesh, normals, geometryVertices.size(), 4);
+            //  decodeTextureCoordinates(mesh, textureCoordinates, geometryVertices.size(), 4);
+
+
+            //  auto* renderGeometry4 = new PositionedGeometry;
+            //  renderGeometry4->vertices() = std::move(geometryVertices);
+            //  renderGeometry4->indices() = std::move(geometryIndices);
+            //  renderGeometry4->material() = renderGeometry3->material();
+            //  renderGeometry4->normals() = std::move(normals);
+            //  renderGeometry4->textureCoordinates() = std::move(textureCoordinates);
+
+            //  renderGeometry4->createBuffers();
+            //  renderGeometry4->transform() = transformMatrix;
+            //  renderGeometry4->mode() = { GL_QUADS, GL_FILL, GL_FRONT };
+            //  fbxGeometry.push_back(renderGeometry4);
+            //}
           }
           break;
         }

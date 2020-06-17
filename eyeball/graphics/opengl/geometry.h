@@ -39,6 +39,14 @@ public:
 
       return *this;
     }
+
+    void set(Type x_, Type y_, Type z_)
+    {
+      this->x = x_;
+      this->y = y_;
+      this->z = z_;
+    }
+
     void normalize() 
     {
       Type length_ = static_cast<Type>(1.0 / length());
@@ -71,6 +79,12 @@ public:
       this->y = y;
     }
 
+    void set(Type x_, Type y_)
+    {
+      this->x = x_;
+      this->y = y_;
+    }
+
     Point2(const Point2& rhs)
     {
       x = rhs.x;
@@ -90,6 +104,61 @@ public:
     bool operator != (const Point2& rhs)
     {
       return !(*this == rhs);
+    }
+  };
+
+  struct Vertex
+  {
+    Point3<float> position;
+    Point3<float> normal;
+    Point2<float> textureCoordinates;
+    size_t index = 0;
+
+    Vertex() = default;
+
+    Vertex(const Vertex& rhs)
+    {
+      position = rhs.position;
+      normal = rhs.normal;
+      textureCoordinates = rhs.textureCoordinates;
+      index = rhs.index;
+    }
+
+    struct Hash
+    {
+      std::size_t operator()(const Vertex& v) const noexcept
+      {
+        auto h1 = std::hash<float>{}(v.position.x);
+        auto h2 = std::hash<float>{}(v.position.y);
+        auto h3 = std::hash<float>{}(v.position.z);
+        auto h4 = std::hash<float>{}(v.normal.x);
+        auto h5 = std::hash<float>{}(v.normal.y);
+        auto h6 = std::hash<float>{}(v.normal.z);
+        auto h7 = std::hash<float>{}(v.textureCoordinates.x);
+        auto h8 = std::hash<float>{}(v.textureCoordinates.y);
+
+        return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h4 << 3) ^ (h5 << 4) ^ (h6 << 5) ^ (h7 << 6) ^ (h8 << 7);
+      }
+    };
+
+    bool operator == (const Vertex& rhs) const
+    {
+      static const float eps = 0.00001f;
+      if (std::fabs(position.x - rhs.position.x) < eps &&
+        std::fabs(position.y - rhs.position.y) < eps &&
+        std::fabs(position.z - rhs.position.z) < eps &&
+        std::fabs(normal.x - rhs.normal.x) < eps &&
+        std::fabs(normal.y - rhs.normal.y) < eps &&
+        std::fabs(normal.z - rhs.normal.z) < eps &&
+        std::fabs(textureCoordinates.x - rhs.textureCoordinates.x) < eps &&
+        std::fabs(textureCoordinates.y - rhs.textureCoordinates.y) < eps)
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
     }
   };
 

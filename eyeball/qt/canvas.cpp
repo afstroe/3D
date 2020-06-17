@@ -92,10 +92,10 @@ void Canvas::initializeGL()
 
   FbxBuilder b;
   
-  //b.load("res/models/free/freida-mod.FBX", fbxGeometry, true);  
+  FbxBuilder().load("res/models/free/freida-mod.FBX", fbxGeometry);
   // FbxBuilder().load("res/models/chibi-avatar/Chibi-Avatar.FBX", fbxGeometry);
-  // FbxBuilder().load("C:\\Users\\alinf\\Desktop\\ponzy\\ponzy.fbx", fbxGeometry, true);
-  FbxBuilder().load("C:\\Users\\alinf\\Desktop\\cubu\\cubu.fbx", fbxGeometry, false);
+  // FbxBuilder().load("C:\\Users\\alinf\\Desktop\\ponzy\\ponzy.fbx", fbxGeometry);
+  // FbxBuilder().load("C:\\Users\\alinf\\Desktop\\cubu\\cubu.fbx", fbxGeometry);
 
   shaderPalette.add(static_cast<int>(ShaderKeys::Material), Shader::fromFiles("shaders/compiled/material.vert", "shaders/compiled/material.frag"));
 
@@ -157,11 +157,11 @@ void Canvas::paintGL()
     geometry->material()->shader()->set("projectionMatrix", glUniformMatrix4fv, 1, GL_FALSE, glm::value_ptr(camera.projectionMatrix()));
     
     //!! TODO: Remove the hard-coded transform
-    // geometry->transform() = glm::mat4(1);// glm::rotate(glm::mat4(1), glm::radians(-90.0f), glm::vec3(0, 1, 0));
-    auto transform = glm::rotate(glm::mat4(1), glm::radians(-90.0f), glm::vec3(1, 0, 0));
+    geometry->transform() = glm::rotate(glm::mat4(1), glm::radians(-90.0f), glm::vec3(0, 1, 0));
+    // auto transform = glm::rotate(glm::mat4(1), glm::radians(-90.0f), glm::vec3(0, 1, 0));
     
     
-    modelViewMatrix = camera.mvMatrix();// *transform;//  geometry->transform();
+    modelViewMatrix = camera.mvMatrix() * geometry->transform();
     geometry->material()->shader()->set("modelViewMatrix", glUniformMatrix4fv, 1, GL_FALSE, glm::value_ptr(modelViewMatrix));
 
     glColor3f(1.0f, 1.0f, 0.0f);
